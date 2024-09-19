@@ -10,12 +10,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<MongoDBSettings>(
     builder.Configuration.GetSection("MongoDB"));
 
-// Register the OrderService as a singleton
+// Register the Service as a singleton
 builder.Services.AddSingleton<OrderService>();
 builder.Services.AddSingleton<PaymentService>();
 builder.Services.AddSingleton<ProductService>();
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<CartService>();
+builder.Services.AddSingleton<NotificationService>();
 
 // Add controllers to the services container
 builder.Services.AddControllers();
