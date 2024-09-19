@@ -1,6 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations;
 
 namespace MongoExample.Models;
 
@@ -8,12 +8,25 @@ public class Playlist {
 
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string? Id { get; set; }
+    public string? UserId { get; set; }
 
-    public string username { get; set; } = null!;
+    [Required(ErrorMessage = "username is required.")]
+    public string Username { get; set; } = null!;
+    
+    [Required(ErrorMessage = "phone number is required.")]
+    public decimal PhoneNumber { get; set; }
 
-    [BsonElement("items")]
-    [JsonPropertyName("items")]
-    public List<string> movieIds { get; set; } = null!;
+    [Required(ErrorMessage = "email is required.")]
+    public string Email { get; set; }= null!;
+
+    [Required(ErrorMessage = "address is required.")]
+    public string Address { get; set; } = null!;
+
+    [Required(ErrorMessage = "role is required.")]
+    public string Role { get; set; } = null!;
+
+    [Required(ErrorMessage = "password is required.")]
+    public string Password { get; set; } = null!;
+    
 
 }
