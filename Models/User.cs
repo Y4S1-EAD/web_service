@@ -2,9 +2,9 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
 
-namespace MongoExample.Models;
-
-public class Playlist {
+namespace web_service.Models
+{
+    public class User {
 
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
@@ -29,4 +29,5 @@ public class Playlist {
     public string Password { get; set; } = null!;
     
 
+}
 }
