@@ -28,7 +28,8 @@ namespace web_service.Models
     [Required(ErrorMessage = "password is required.")]
     public string Password { get; set; } = null!;
     
-    public string Ratings { get; set; }
+     // This field is now optional (not required)
+    public string? Ratings { get; set; }
     
 }
 }
