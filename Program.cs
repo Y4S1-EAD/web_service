@@ -13,6 +13,7 @@ builder.Services.Configure<MongoDBSettings>(
 // Register the OrderService as a singleton
 builder.Services.AddSingleton<OrderService>();
 builder.Services.AddSingleton<PaymentService>();
+builder.Services.AddSingleton<UserService>();
 
 // Add controllers to the services container
 builder.Services.AddControllers();
