@@ -15,6 +15,7 @@ builder.Services.AddSingleton<OrderService>();
 builder.Services.AddSingleton<PaymentService>();
 builder.Services.AddSingleton<ProductService>();
 builder.Services.AddSingleton<UserService>();
+builder.Services.AddSingleton<CartService>();
 
 // Add controllers to the services container
 builder.Services.AddControllers();
