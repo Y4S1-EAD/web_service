@@ -41,5 +41,10 @@ namespace web_service.Services
         {
             await _productsCollection.DeleteOneAsync(x => x.ProductId == id);
         }
+
+        public async Task<List<Product>> GetByCategoryIdAsync(string categoryId)
+        {
+            return await _productsCollection.Find(x => x.CategoryId == categoryId).ToListAsync();
+        }
     }
 }
