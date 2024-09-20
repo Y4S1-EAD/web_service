@@ -14,6 +14,7 @@ builder.Services.Configure<MongoDBSettings>(
 builder.Services.AddSingleton<OrderService>();
 builder.Services.AddSingleton<PaymentService>();
 builder.Services.AddSingleton<ProductService>();
+builder.Services.AddSingleton<CategoryService>();
 
 // Add controllers to the services container
 builder.Services.AddControllers();
