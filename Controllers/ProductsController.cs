@@ -59,6 +59,27 @@ namespace web_service.Controllers
             }
         }
 
+        // ------------------ GET: api/products/by-category/{categoryId} ------------------
+        [HttpGet("by-category/{categoryId:length(24)}")]
+        public async Task<IActionResult> GetProductsByCategory(string categoryId)
+        {
+            try
+            {
+                var products = await _productService.GetByCategoryIdAsync(categoryId);
+
+                if (products == null || products.Count == 0)
+                {
+                    return NotFound(new { message = "No products found for the specified category." });
+                }
+
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving products by category.", error = ex.Message });
+            }
+        }
+
         // ------------------ POST: api/products ------------------
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Product newProduct)
