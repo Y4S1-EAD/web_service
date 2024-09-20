@@ -12,6 +12,7 @@ namespace web_service.Models
         public string OrderId { get; set; }
 
         [Required(ErrorMessage = "UserId is required.")]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string UserId { get; set; }
 
         [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
@@ -34,6 +35,7 @@ namespace web_service.Models
 
         [Required(ErrorMessage = "At least one ProductId is required.")]
         [MinLength(1, ErrorMessage = "At least one ProductId must be provided.")]
+        [BsonRepresentation(BsonType.ObjectId)]
         public List<string> ProductIds { get; set; } = new List<string>();
 
         [Required(ErrorMessage = "PaymentId is required.")]

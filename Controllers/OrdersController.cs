@@ -14,11 +14,15 @@ namespace web_service.Controllers
     {
         private readonly OrderService _orderService;
         private readonly PaymentService _paymentService;
+        private readonly UserService _userService;
+        private readonly ProductService _productService;
 
-        public OrdersController(OrderService orderService, PaymentService paymentService)
+        public OrdersController(OrderService orderService, PaymentService paymentService, UserService userService, ProductService productService)
         {
             _orderService = orderService;
             _paymentService = paymentService;
+            _userService = userService;
+            _productService = productService;
         }
 
         [HttpGet]
@@ -73,11 +77,34 @@ namespace web_service.Controllers
 
             try
             {
+                // Validate UserId exists
+                bool userExists = await _userService.UserExistsAsync(newOrder.UserId);
+                if (!userExists)
+                {
+                    return BadRequest(new { message = "Invalid UserId: User not found." });
+                }
+
                 // Validate PaymentId exists
                 var payment = await _paymentService.GetAsync(newOrder.PaymentId);
                 if (payment == null)
                 {
                     return BadRequest(new { message = "Invalid PaymentId: Payment not found." });
+                }
+
+                // Validate ProductIds exist
+                List<string> invalidProductIds = new List<string>();
+                foreach (var productId in newOrder.ProductIds)
+                {
+                    bool productExists = await _productService.ProductExistsAsync(productId);
+                    if (!productExists)
+                    {
+                        invalidProductIds.Add(productId);
+                    }
+                }
+
+                if (invalidProductIds.Any())
+                {
+                    return BadRequest(new { message = "Invalid ProductIds: The following products were not found.", invalidProductIds });
                 }
 
                 await _orderService.CreateAsync(newOrder);
@@ -102,17 +129,24 @@ namespace web_service.Controllers
                 return BadRequest(new { message = "Validation failed.", errors });
             }
 
-            try
+             try
             {
-                var order = await _orderService.GetAsync(id);
+                var existingOrder = await _orderService.GetAsync(id);
 
-                if (order == null)
+                if (existingOrder == null)
                 {
                     return NotFound(new { message = "Order not found." });
                 }
 
-                // Validate PaymentId if it has changed
-                if (updatedOrder.PaymentId != order.PaymentId)
+                // Validate UserId exists
+                bool userExists = await _userService.UserExistsAsync(updatedOrder.UserId);
+                if (!userExists)
+                {
+                    return BadRequest(new { message = "Invalid UserId: User not found." });
+                }
+
+                // Validate PaymentId exists (if it has changed)
+                if (updatedOrder.PaymentId != existingOrder.PaymentId)
                 {
                     var payment = await _paymentService.GetAsync(updatedOrder.PaymentId);
                     if (payment == null)
@@ -121,7 +155,23 @@ namespace web_service.Controllers
                     }
                 }
 
-                updatedOrder.OrderId = order.OrderId;
+                // Validate ProductIds exist
+                List<string> invalidProductIds = new List<string>();
+                foreach (var productId in updatedOrder.ProductIds)
+                {
+                    bool productExists = await _productService.ProductExistsAsync(productId);
+                    if (!productExists)
+                    {
+                        invalidProductIds.Add(productId);
+                    }
+                }
+
+                if (invalidProductIds.Any())
+                {
+                    return BadRequest(new { message = "Invalid ProductIds: The following products were not found.", invalidProductIds });
+                }
+
+                updatedOrder.OrderId = existingOrder.OrderId;
 
                 await _orderService.UpdateAsync(id, updatedOrder);
 
