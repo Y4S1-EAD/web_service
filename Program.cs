@@ -4,9 +4,15 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load the ENV package before creating the builder
+if (File.Exists(".env"))
+{
+    DotNetEnv.Env.Load();
+}
+
 // Add services to the container.
 
-// Configure MongoDB settings from appsettings.json
+// Configure MongoDB settings from appsettings.json or .env
 builder.Services.Configure<MongoDBSettings>(
     builder.Configuration.GetSection("MongoDB"));
 

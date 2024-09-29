@@ -29,6 +29,12 @@ namespace web_service.Services
             return await _usersCollection.Find(x => x.UserId == id).FirstOrDefaultAsync();
         }
 
+        // Get a user by username (used in the login process)
+        public async Task<User> GetByUsernameAsync(string username)
+        {
+            return await _usersCollection.Find(x => x.Username == username).FirstOrDefaultAsync();
+        }
+
         // Create a new user
         public async Task CreateAsync(User user)
         {
