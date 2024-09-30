@@ -180,7 +180,8 @@ namespace web_service.Controllers
                 {
                     message = "Login successful",
                     username = user.Username,
-                    role = user.Role
+                    role = user.Role,
+                    userId = user.UserId
                 });
             }
             catch (Exception ex)
