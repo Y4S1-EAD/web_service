@@ -169,6 +169,12 @@ namespace web_service.Controllers
                     return NotFound(new { message = "User not found." });
                 }
 
+                // Check user status, only allow login if status is "Accept"
+                if (user.Status != Status.Accept)
+                {
+                    return BadRequest(new { message = $"Login not allowed. Your account status is '{user.Status}'." });
+                }
+
                 // Verify password
                 if (!VerifyPassword(loginRequest.Password, user.Password))
                 {
