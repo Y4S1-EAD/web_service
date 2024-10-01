@@ -31,6 +31,10 @@ namespace web_service.Models
         // Optional field
         public string? Ratings { get; set; }
 
+         // Rating stats for vendors
+        public double AverageRating { get; set; } = 0.0; // Average rating
+        public int NumberOfReviews { get; set; } = 0;    // Total number of reviews
+
         // New Status field with Enum
         [BsonRepresentation(BsonType.String)]
         [Required(ErrorMessage = "status is required.")]
