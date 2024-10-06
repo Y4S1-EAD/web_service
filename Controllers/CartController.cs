@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using web_service.Models;
 using web_service.Services;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System;
 
 namespace web_service.Controllers
 {
@@ -9,10 +13,14 @@ namespace web_service.Controllers
     public class CartController : ControllerBase
     {
         private readonly CartService _cartService;
+        private readonly ProductService _productService;
+        private readonly UserService _userService;
 
-        public CartController(CartService cartService)
+        public CartController(CartService cartService, ProductService productService, UserService userService)
         {
             _cartService = cartService;
+            _productService = productService;
+            _userService = userService;
         }
 
         // GET: api/Cart
@@ -26,7 +34,6 @@ namespace web_service.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception as needed
                 return StatusCode(500, new { message = "An error occurred while retrieving carts.", error = ex.Message });
             }
         }
@@ -48,8 +55,28 @@ namespace web_service.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception as needed
                 return StatusCode(500, new { message = "An error occurred while retrieving the cart.", error = ex.Message });
+            }
+        }
+
+        // GET: api/Cart/{userId}
+        [HttpGet("user/{userId:length(24)}")]
+        public async Task<IActionResult> GetByUserId(string userId)
+        {
+            try
+            {
+                var carts = await _cartService.GetByUserIdAsync(userId);
+
+                if (carts == null || !carts.Any())
+                {
+                    return NotFound(new { message = "No carts found for this user." });
+                }
+
+                return Ok(carts);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving the cart by userId.", error = ex.Message });
             }
         }
 
@@ -70,12 +97,34 @@ namespace web_service.Controllers
 
             try
             {
+                // Validate UserId exists
+                var user = await _userService.GetAsync(newCart.UserId);
+                if (user == null)
+                {
+                    return BadRequest(new { message = "Invalid UserId: User not found." });
+                }
+
+                // Validate ProductIds exist
+                List<string> invalidProductIds = new List<string>();
+                foreach (var productId in newCart.ProductIds)
+                {
+                    var product = await _productService.GetAsync(productId);
+                    if (product == null)
+                    {
+                        invalidProductIds.Add(productId);
+                    }
+                }
+
+                if (invalidProductIds.Any())
+                {
+                    return BadRequest(new { message = "Invalid ProductIds: The following products were not found.", invalidProductIds });
+                }
+
                 await _cartService.CreateAsync(newCart);
                 return Ok(new { message = "Cart created successfully.", cart = newCart });
             }
             catch (Exception ex)
             {
-                // Log the exception as needed
                 return StatusCode(500, new { message = "An error occurred while creating the cart.", error = ex.Message });
             }
         }
@@ -95,14 +144,37 @@ namespace web_service.Controllers
 
             try
             {
-                var cart = await _cartService.GetAsync(id);
+                var existingCart = await _cartService.GetAsync(id);
 
-                if (cart == null)
+                if (existingCart == null)
                 {
                     return NotFound(new { message = "Cart not found." });
                 }
 
-                updatedCart.CartId = cart.CartId; // Keep the original CartId
+                // Validate UserId exists
+                var user = await _userService.GetAsync(updatedCart.UserId);
+                if (user == null)
+                {
+                    return BadRequest(new { message = "Invalid UserId: User not found." });
+                }
+
+                // Validate ProductIds exist
+                List<string> invalidProductIds = new List<string>();
+                foreach (var productId in updatedCart.ProductIds)
+                {
+                    var product = await _productService.GetAsync(productId);
+                    if (product == null)
+                    {
+                        invalidProductIds.Add(productId);
+                    }
+                }
+
+                if (invalidProductIds.Any())
+                {
+                    return BadRequest(new { message = "Invalid ProductIds: The following products were not found.", invalidProductIds });
+                }
+
+                updatedCart.CartId = existingCart.CartId;
 
                 await _cartService.UpdateAsync(id, updatedCart);
 
@@ -110,7 +182,6 @@ namespace web_service.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception as needed
                 return StatusCode(500, new { message = "An error occurred while updating the cart.", error = ex.Message });
             }
         }
@@ -134,7 +205,6 @@ namespace web_service.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception as needed
                 return StatusCode(500, new { message = "An error occurred while deleting the cart.", error = ex.Message });
             }
         }

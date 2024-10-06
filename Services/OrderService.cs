@@ -1,6 +1,8 @@
 using web_service.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace web_service.Services
 {
@@ -25,11 +27,15 @@ namespace web_service.Services
             return await _ordersCollection.Find(x => x.OrderId == id).FirstOrDefaultAsync();
         }
 
+        public async Task<List<Order>> GetByUserIdAsync(string userId)
+        {
+            return await _ordersCollection.Find(x => x.UserId == userId).ToListAsync();
+        }
+
         public async Task CreateAsync(Order order)
         {
             await _ordersCollection.InsertOneAsync(order);
         }
-
 
         public async Task UpdateAsync(string id, Order updatedOrder)
         {

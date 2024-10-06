@@ -25,6 +25,7 @@ namespace web_service.Controllers
             _productService = productService;
         }
 
+        // GET: api/Orders
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -40,6 +41,7 @@ namespace web_service.Controllers
             }
         }
 
+        // GET: api/Orders/{id}
         [HttpGet("{id:length(24)}")]
         public async Task<IActionResult> Get(string id)
         {
@@ -58,6 +60,28 @@ namespace web_service.Controllers
             {
                 // Log the exception as needed
                 return StatusCode(500, new { message = "An error occurred while retrieving the order.", error = ex.Message });
+            }
+        }
+
+        // GET: api/Orders/user/{userId}
+        [HttpGet("user/{userId:length(24)}")]
+        public async Task<IActionResult> GetByUserId(string userId)
+        {
+            try
+            {
+                var orders = await _orderService.GetByUserIdAsync(userId);
+
+                if (orders == null || !orders.Any())
+                {
+                    return NotFound(new { message = "No orders found for this user." });
+                }
+
+                return Ok(orders);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception as needed
+                return StatusCode(500, new { message = "An error occurred while retrieving orders by UserId.", error = ex.Message });
             }
         }
 
