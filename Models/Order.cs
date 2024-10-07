@@ -38,7 +38,7 @@ namespace web_service.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public List<string> ProductIds { get; set; } = new List<string>();
 
-        [Required(ErrorMessage = "PaymentId is required.")]
+        // [Required(ErrorMessage = "PaymentId is required.")]
         [BsonRepresentation(BsonType.ObjectId)]
         public string PaymentId { get; set; }
 

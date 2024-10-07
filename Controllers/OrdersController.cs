@@ -109,11 +109,12 @@ namespace web_service.Controllers
                 }
 
                 // Validate PaymentId exists
-                var payment = await _paymentService.GetAsync(newOrder.PaymentId);
-                if (payment == null)
-                {
-                    return BadRequest(new { message = "Invalid PaymentId: Payment not found." });
-                }
+                // var payment = await _paymentService.GetAsync(newOrder.PaymentId);
+                // if (payment == null)
+                // {
+                //     return BadRequest(new { message = "Invalid PaymentId: Payment not found." });
+                // }
+                
 
                 // Validate ProductIds exist
                 List<string> invalidProductIds = new List<string>();
@@ -170,14 +171,14 @@ namespace web_service.Controllers
                 }
 
                 // Validate PaymentId exists (if it has changed)
-                if (updatedOrder.PaymentId != existingOrder.PaymentId)
-                {
-                    var payment = await _paymentService.GetAsync(updatedOrder.PaymentId);
-                    if (payment == null)
-                    {
-                        return BadRequest(new { message = "Invalid PaymentId: Payment not found." });
-                    }
-                }
+                // if (updatedOrder.PaymentId != existingOrder.PaymentId)
+                // {
+                //     var payment = await _paymentService.GetAsync(updatedOrder.PaymentId);
+                //     if (payment == null)
+                //     {
+                //         return BadRequest(new { message = "Invalid PaymentId: Payment not found." });
+                //     }
+                // }
 
                 // Validate ProductIds exist
                 List<string> invalidProductIds = new List<string>();
