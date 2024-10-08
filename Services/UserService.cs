@@ -1,6 +1,7 @@
 using web_service.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace web_service.Services
 {
@@ -45,6 +46,25 @@ namespace web_service.Services
         public async Task UpdateAsync(string id, User updatedUser)
         {
             await _usersCollection.ReplaceOneAsync(x => x.UserId == id, updatedUser);
+        }
+
+        // Partially update a user
+        public async Task<bool> UpdatePartialAsync(string id, JsonPatchDocument<User> patchDocument)
+        {
+            var user = await GetAsync(id);
+
+            if (user == null)
+            {
+                return false;
+            }
+
+            // Apply the patch to the user object
+            patchDocument.ApplyTo(user);
+
+            // Replace the updated user in the database
+            await _usersCollection.ReplaceOneAsync(x => x.UserId == id, user);
+            
+            return true;
         }
 
         // Remove a user by ID

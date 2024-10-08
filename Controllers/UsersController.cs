@@ -4,6 +4,9 @@ using web_service.Services;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.JsonPatch;
+using Newtonsoft.Json;
+
 
 namespace web_service.Controllers
 {
@@ -128,6 +131,62 @@ namespace web_service.Controllers
                 return StatusCode(500, new { message = "An error occurred while updating the user.", error = ex.Message });
             }
         }
+
+        // PATCH: api/Users/{id}
+        [HttpPatch("{id:length(24)}")]
+        public async Task<IActionResult> PatchUpdate(string id, [FromBody] JsonPatchDocument<User> patchDocument)
+        {
+            if (patchDocument == null)
+            {
+                return BadRequest(new { message = "Invalid patch document." });
+            }
+
+            try
+            {
+                var user = await _userService.GetAsync(id);
+
+                if (user == null)
+                {
+                    return NotFound(new { message = "User not found." });
+                }
+
+                // Apply the patch to the user entity
+                patchDocument.ApplyTo(user, ModelState);
+
+                if (!ModelState.IsValid)
+                {
+                    var errors = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage).ToList();
+
+                    return BadRequest(new { message = "Validation failed.", errors });
+                }
+
+                // Check if the Password field is part of the patch operations
+                var passwordOperation = patchDocument.Operations.FirstOrDefault(op => op.path == "/Password");
+
+                if (passwordOperation != null && !string.IsNullOrEmpty(user.Password))
+                {
+                    // Hash the password only if it's being updated
+                    user.Password = HashPassword(user.Password);
+                }
+                else
+                {
+                    // Keep the original password if it's not being updated
+                    var existingUser = await _userService.GetAsync(id);
+                    user.Password = existingUser.Password;
+                }
+
+                await _userService.UpdateAsync(id, user);
+
+                return Ok(new { message = "User updated successfully.", user });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating the user.", error = ex.Message });
+            }
+        }
+
 
         // DELETE: api/Users/{id}
         [HttpDelete("{id:length(24)}")]

@@ -26,8 +26,12 @@ builder.Services.AddSingleton<NotificationService>();
 builder.Services.AddSingleton<CategoryService>();
 builder.Services.AddSingleton<RatingService>();
 
-// Add controllers to the services container
-builder.Services.AddControllers();
+// Add controllers and configure Newtonsoft.Json
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+    });
 
 // Optional: Register Swagger services for API documentation
 builder.Services.AddEndpointsApiExplorer();
