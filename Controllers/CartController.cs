@@ -208,5 +208,31 @@ namespace web_service.Controllers
                 return StatusCode(500, new { message = "An error occurred while deleting the cart.", error = ex.Message });
             }
         }
+
+        // DELETE: api/Cart/user/{userId}
+        [HttpDelete("user/{userId:length(24)}")]
+        public async Task<IActionResult> DeleteByUserId(string userId)
+        {
+            try
+            {
+                var carts = await _cartService.GetByUserIdAsync(userId);
+
+                if (carts == null || !carts.Any())
+                {
+                    return NotFound(new { message = "No carts found for this user." });
+                }
+
+                foreach (var cart in carts)
+                {
+                    await _cartService.RemoveAsync(cart.CartId);
+                }
+
+                return Ok(new { message = "Carts for the user deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while deleting the carts for the user.", error = ex.Message });
+            }
+        }
     }
 }
