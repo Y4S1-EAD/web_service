@@ -86,6 +86,32 @@ namespace web_service.Services
                 StarDistribution = starDistribution
             };
         }
+
+        // Get all ratings for a specific user
+        public async Task<List<Ratings>> GetRatingsByUserAsync(string userId)
+        {
+            return await _ratingsCollection.Find(r => r.UserId == userId).ToListAsync();
+        }
+
+        // Get a specific rating by ID (new method to fix the issue)
+        public async Task<Ratings> GetRatingByIdAsync(string ratingId)
+        {
+            return await _ratingsCollection.Find(r => r.RatingId == ratingId).FirstOrDefaultAsync();
+        }
+
+        // Update a specific rating
+        public async Task<bool> UpdateRatingAsync(string ratingId, Ratings updatedRating)
+        {
+            var filter = Builders<Ratings>.Filter.Eq(r => r.RatingId, ratingId);
+            var update = Builders<Ratings>.Update
+                .Set(r => r.RatingValue, updatedRating.RatingValue)
+                .Set(r => r.Comment, updatedRating.Comment)
+                .Set(r => r.DatePosted, DateTime.Now); // Optional: Update the date to the current time
+
+            var result = await _ratingsCollection.UpdateOneAsync(filter, update);
+
+            return result.ModifiedCount > 0;
+        }
     }
 
     public class VendorRatingSummary
