@@ -47,6 +47,15 @@ builder.Services.AddCors(options =>
                         .AllowCredentials());
 });
 
+// For all requests
+// builder.Services.AddCors(options =>
+// {
+//     options.AddPolicy("AllowReactApp",
+//         policy => policy.WithOrigins("*")  // Allow all origins
+//                         .AllowAnyMethod()
+//                         .AllowAnyHeader());
+// });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
