@@ -41,5 +41,10 @@ namespace web_service.Services
         {
             await _categoriesCollection.DeleteOneAsync(x => x.CategoryId == id);
         }
+
+        public async Task<List<Category>> GetActiveCategoriesAsync()
+        {
+            return await _categoriesCollection.Find(x => x.IsActive == true).ToListAsync();
+        }
     }
 }
