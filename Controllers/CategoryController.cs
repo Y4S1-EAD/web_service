@@ -139,5 +139,20 @@ namespace web_service.Controllers
                 return StatusCode(500, new { message = "An error occurred while deleting the category.", error = ex.Message });
             }
         }
+
+        // ------------------ GET: api/category/active ------------------
+        [HttpGet("active")]
+        public async Task<IActionResult> GetActiveCategories()
+        {
+            try
+            {
+                var activeCategories = await _categoryService.GetActiveCategoriesAsync();
+                return Ok(activeCategories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving active categories.", error = ex.Message });
+            }
+        }
     }
 }
